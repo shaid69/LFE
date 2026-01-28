@@ -22,7 +22,6 @@
   --muted:#64748b;
   --border:#e2e8f0;
 
-  /* IUB Colors */
   --iub1:#003A8F;
   --iub2:#0057B8;
   --iub3:#2F80ED;
@@ -58,13 +57,7 @@ body{
 .brand-text{
   font-size:22px;
   font-weight:800;
-  background:linear-gradient(
-    90deg,
-    var(--iub1),
-    var(--iub2),
-    var(--iub3),
-    var(--iub2)
-  );
+  background:linear-gradient(90deg, var(--iub1), var(--iub2), var(--iub3), var(--iub2));
   background-size:300%;
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
@@ -143,14 +136,6 @@ footer{
 <!-- MAIN -->
 <div class="container my-4">
 
-  <!-- Upload -->
-  <div class="card mb-4">
-    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
-      <h5 class="mb-0 fw-semibold">Upload Photos & Memories</h5>
-      <input type="file" id="upload" multiple accept="image/*">
-    </div>
-  </div>
-
   <!-- Gallery -->
   <div class="row g-4" id="gallery"></div>
 
@@ -188,62 +173,35 @@ function toggleTheme(){
   localStorage.theme = theme;
 }
 
-/* ALBUM + AUTO SAVE */
-const upload = document.getElementById('upload');
+/* GALLERY LOAD FROM LFE FOLDER */
 const gallery = document.getElementById('gallery');
 const modalImg = document.getElementById('modalImg');
 const modal = new bootstrap.Modal(document.getElementById('imageModal'));
 
-// Load from localStorage
+// Manually list images in lfe folder
+// Add new images here as you upload to GitHub
+const images = [
+  "lfe/b1a93a5e-b4a2-4b4a-9331-0a25b3f18981.png"
+  // Add more: "lfe/another-image.png"
+];
+
 function loadGallery(){
-  const data = localStorage.getItem('iub_album');
-  if(data) gallery.innerHTML = data;
-
-  // Reattach textarea input for auto-save
-  document.querySelectorAll('#gallery textarea').forEach(t=>{
-    t.addEventListener('input', saveGallery);
-  });
-}
-loadGallery();
-
-// Save gallery to localStorage
-function saveGallery(){
-  localStorage.setItem('iub_album', gallery.innerHTML);
-}
-
-upload.onchange = () => {
-  [...upload.files].forEach(file=>{
-    const r = new FileReader();
-    r.onload = e=>{
-      const cardHTML = `
+  gallery.innerHTML = "";
+  images.forEach(src => {
+    gallery.innerHTML += `
       <div class="col-lg-4 col-md-6">
         <div class="card h-100">
-          <img src="${e.target.result}" class="card-img-top" onclick="openModal(this.src)">
+          <img src="${src}" class="card-img-top" onclick="openModal('${src}')">
           <div class="card-body">
             <textarea class="form-control mb-2" rows="2" placeholder="Write description..."></textarea>
-            <div class="d-flex gap-2">
-              <button class="btn btn-outline-primary w-100">Edit</button>
-              <button class="btn btn-outline-danger w-100 remove-btn">Delete</button>
-            </div>
           </div>
         </div>
-      </div>`;
-      gallery.insertAdjacentHTML('beforeend', cardHTML);
-      saveGallery();
-
-      // Attach auto-save to textarea
-      gallery.querySelectorAll('textarea').forEach(t=>{
-        t.addEventListener('input', saveGallery);
-      });
-
-      // Attach delete
-      gallery.querySelectorAll('.remove-btn').forEach(btn=>{
-        btn.onclick = () => { btn.closest('.col-lg-4').remove(); saveGallery(); }
-      });
-    }
-    r.readAsDataURL(file);
+      </div>
+    `;
   });
-};
+}
+
+loadGallery();
 
 function openModal(src){
   modalImg.src = src;
